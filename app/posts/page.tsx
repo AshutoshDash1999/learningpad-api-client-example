@@ -14,6 +14,7 @@ import {
 } from "@/api/hooks/usePosts";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 /**
  * Posts Page - Demonstrates comprehensive usage of @learningpad/api-client
@@ -80,13 +81,41 @@ export default function PostsPage() {
    * - Success/error notifications
    * - Loading states during mutations
    */
-  const createPostMutation = useCreatePost();
-  const updatePostMutation = useUpdatePost();
-  const deletePostMutation = useDeletePost();
+  const {
+    mutateAsync: createPost,
+    isPending: isCreatingPost,
+    error: createPostError,
+  } = useCreatePost();
 
-  const createCommentMutation = useCreateComment();
-  const updateCommentMutation = useUpdateComment();
-  const deleteCommentMutation = useDeleteComment();
+  const {
+    mutateAsync: updatePost,
+    isPending: isUpdatingPost,
+    error: updatePostError,
+  } = useUpdatePost();
+
+  const {
+    mutateAsync: deletePost,
+    isPending: isDeletingPost,
+    error: deletePostError,
+  } = useDeletePost();
+
+  const {
+    mutateAsync: createComment,
+    isPending: isCreatingComment,
+    error: createCommentError,
+  } = useCreateComment();
+
+  const {
+    mutateAsync: updateComment,
+    isPending: isUpdatingComment,
+    error: updateCommentError,
+  } = useUpdateComment();
+
+  const {
+    mutateAsync: deleteComment,
+    isPending: isDeletingComment,
+    error: deleteCommentError,
+  } = useDeleteComment();
 
   // Filter comments for selected post
   const postComments = selectedPost
@@ -102,12 +131,14 @@ export default function PostsPage() {
     e.preventDefault();
     try {
       // The mutation hook handles the API call, cache invalidation, and notifications
-      await createPostMutation.mutateAsync(postFormData);
+      await createPost(postFormData);
       setPostFormData({ title: "", body: "", userId: 1 });
       setShowCreatePostForm(false);
+      toast.success("Post created successfully!");
     } catch (error) {
       // Error handling is managed by the mutation hook
       console.error("Failed to create post:", error);
+      toast.error("Failed to create post. Please try again.");
     }
   };
 
@@ -117,14 +148,16 @@ export default function PostsPage() {
 
     try {
       // Update mutation with ID and partial data
-      await updatePostMutation.mutateAsync({
+      await updatePost({
         id: selectedPost.id.toString(),
         data: postFormData,
       });
       setShowUpdatePostForm(false);
       setSelectedPost(null);
+      toast.success("Post updated successfully!");
     } catch (error) {
       console.error("Failed to update post:", error);
+      toast.error("Failed to update post. Please try again.");
     }
   };
 
@@ -132,9 +165,11 @@ export default function PostsPage() {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
         // Delete mutation with post ID
-        await deletePostMutation.mutateAsync(postId.toString());
+        await deletePost(postId.toString());
+        toast.success("Post deleted successfully!");
       } catch (error) {
         console.error("Failed to delete post:", error);
+        toast.error("Failed to delete post. Please try again.");
       }
     }
   };
@@ -145,11 +180,13 @@ export default function PostsPage() {
   const handleCreateComment = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createCommentMutation.mutateAsync(commentFormData);
+      await createComment(commentFormData);
       setCommentFormData({ postId: 1, name: "", email: "", body: "" });
       setShowCreateCommentForm(false);
+      toast.success("Comment added successfully!");
     } catch (error) {
       console.error("Failed to create comment:", error);
+      toast.error("Failed to add comment. Please try again.");
     }
   };
 
@@ -158,23 +195,27 @@ export default function PostsPage() {
     if (!selectedComment) return;
 
     try {
-      await updateCommentMutation.mutateAsync({
+      await updateComment({
         id: selectedComment.id.toString(),
         data: commentFormData,
       });
       setShowUpdateCommentForm(false);
       setSelectedComment(null);
+      toast.success("Comment updated successfully!");
     } catch (error) {
       console.error("Failed to update comment:", error);
+      toast.error("Failed to update comment. Please try again.");
     }
   };
 
   const handleDeleteComment = async (commentId: number) => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
-        await deleteCommentMutation.mutateAsync(commentId.toString());
+        await deleteComment(commentId.toString());
+        toast.success("Comment deleted successfully!");
       } catch (error) {
         console.error("Failed to delete comment:", error);
+        toast.error("Failed to delete comment. Please try again.");
       }
     }
   };
@@ -208,9 +249,9 @@ export default function PostsPage() {
                 resetPostForm();
                 setShowCreatePostForm(true);
               }}
-              disabled={createPostMutation.isPending}
+              disabled={isCreatingPost}
             >
-              {createPostMutation.isPending ? "Creating..." : "Create Post"}
+              {isCreatingPost ? "Creating..." : "Create Post"}
             </Button>
             <Button
               variant="outline"
@@ -259,7 +300,7 @@ export default function PostsPage() {
                         });
                         setShowUpdatePostForm(true);
                       }}
-                      disabled={updatePostMutation.isPending}
+                      disabled={isUpdatingPost}
                     >
                       Edit
                     </Button>
@@ -267,7 +308,7 @@ export default function PostsPage() {
                       size="sm"
                       variant="destructive"
                       onClick={() => handleDeletePost(post.id)}
-                      disabled={deletePostMutation.isPending}
+                      disabled={isDeletingPost}
                     >
                       Delete
                     </Button>
@@ -299,11 +340,9 @@ export default function PostsPage() {
                   }));
                   setShowCreateCommentForm(true);
                 }}
-                disabled={createCommentMutation.isPending}
+                disabled={isCreatingComment}
               >
-                {createCommentMutation.isPending
-                  ? "Creating..."
-                  : "Add Comment"}
+                {isCreatingComment ? "Creating..." : "Add Comment"}
               </Button>
               <Button variant="outline" onClick={() => setSelectedPost(null)}>
                 Close
@@ -341,7 +380,7 @@ export default function PostsPage() {
                           });
                           setShowUpdateCommentForm(true);
                         }}
-                        disabled={updateCommentMutation.isPending}
+                        disabled={isUpdatingComment}
                       >
                         Edit
                       </Button>
@@ -349,7 +388,7 @@ export default function PostsPage() {
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeleteComment(comment.id)}
-                        disabled={deleteCommentMutation.isPending}
+                        disabled={isDeletingComment}
                       >
                         Delete
                       </Button>
@@ -423,8 +462,8 @@ export default function PostsPage() {
                 />
               </div>
               <div className="flex space-x-2">
-                <Button type="submit" disabled={createPostMutation.isPending}>
-                  {createPostMutation.isPending ? "Creating..." : "Create Post"}
+                <Button type="submit" disabled={isCreatingPost}>
+                  {isCreatingPost ? "Creating..." : "Create Post"}
                 </Button>
                 <Button
                   type="button"
@@ -494,8 +533,8 @@ export default function PostsPage() {
                 />
               </div>
               <div className="flex space-x-2">
-                <Button type="submit" disabled={updatePostMutation.isPending}>
-                  {updatePostMutation.isPending ? "Updating..." : "Update Post"}
+                <Button type="submit" disabled={isUpdatingPost}>
+                  {isUpdatingPost ? "Updating..." : "Update Post"}
                 </Button>
                 <Button
                   type="button"
@@ -563,13 +602,8 @@ export default function PostsPage() {
                 />
               </div>
               <div className="flex space-x-2">
-                <Button
-                  type="submit"
-                  disabled={createCommentMutation.isPending}
-                >
-                  {createCommentMutation.isPending
-                    ? "Adding..."
-                    : "Add Comment"}
+                <Button type="submit" disabled={isCreatingComment}>
+                  {isCreatingComment ? "Adding..." : "Add Comment"}
                 </Button>
                 <Button
                   type="button"
@@ -637,13 +671,8 @@ export default function PostsPage() {
                 />
               </div>
               <div className="flex space-x-2">
-                <Button
-                  type="submit"
-                  disabled={updateCommentMutation.isPending}
-                >
-                  {updateCommentMutation.isPending
-                    ? "Updating..."
-                    : "Update Comment"}
+                <Button type="submit" disabled={isUpdatingComment}>
+                  {isUpdatingComment ? "Updating..." : "Update Comment"}
                 </Button>
                 <Button
                   type="button"

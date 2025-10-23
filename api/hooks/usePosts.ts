@@ -1,11 +1,10 @@
-import { useApiMutation, useApiQuery } from "@learningpad/api-client";
+import { postService } from "../config";
 
 // Query hook for fetching users
 export const usePosts = () => {
-  return useApiQuery<Post[]>({
-    serviceName: "posts", // Must match your service name
+  return postService.useQuery<Post[]>({
     key: ["posts"],
-    url: "/posts",
+    url: "/",
     options: {
       staleTime: 5 * 60 * 1000, // 5 minutes
     },
@@ -14,10 +13,9 @@ export const usePosts = () => {
 
 // Mutation hook for creating users
 export const useCreatePost = () => {
-  return useApiMutation<Post, CreatePost>({
-    serviceName: "posts",
+  return postService.useMutation<Post, CreatePost>({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "/posts",
+    url: "/",
     method: "post",
     successMessage: "Post created successfully!",
     errorMessage: "Failed to create post",
@@ -26,10 +24,12 @@ export const useCreatePost = () => {
 
 // Mutation hook for updating users
 export const useUpdatePost = () => {
-  return useApiMutation<Post, { id: string; data: Partial<CreatePost> }>({
-    serviceName: "posts",
+  return postService.useMutation<
+    Post,
+    { id: string; data: Partial<CreatePost> }
+  >({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "/posts",
+    url: "/",
     method: "put",
     successMessage: "Post updated successfully!",
     errorMessage: "Failed to update post",
@@ -38,10 +38,9 @@ export const useUpdatePost = () => {
 
 // Mutation hook for deleting users
 export const useDeletePost = () => {
-  return useApiMutation<void, string>({
-    serviceName: "posts",
+  return postService.useMutation<void, string>({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "/posts",
+    url: "/",
     method: "delete",
     successMessage: "Post deleted successfully!",
     errorMessage: "Failed to delete post",

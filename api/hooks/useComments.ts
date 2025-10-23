@@ -1,11 +1,10 @@
-import { useApiMutation, useApiQuery } from "@learningpad/api-client";
+import { commentService } from "../config";
 
 // Query hook for fetching comments
 export const useComments = () => {
-  return useApiQuery<Comment[]>({
-    serviceName: "comments", // Must match your service name
+  return commentService.useQuery<Comment[]>({
     key: ["comments"],
-    url: "/comments",
+    url: "/",
     options: {
       staleTime: 5 * 60 * 1000, // 5 minutes
     },
@@ -14,10 +13,9 @@ export const useComments = () => {
 
 // Mutation hook for creating comments
 export const useCreateComment = () => {
-  return useApiMutation<Comment, CreateComment>({
-    serviceName: "comments",
+  return commentService.useMutation<Comment, CreateComment>({
     keyToInvalidate: { queryKey: ["comments"] },
-    url: "/comments",
+    url: "/",
     method: "post",
     successMessage: "Comment created successfully!",
     errorMessage: "Failed to create comment",
@@ -26,10 +24,12 @@ export const useCreateComment = () => {
 
 // Mutation hook for updating comments
 export const useUpdateComment = () => {
-  return useApiMutation<Comment, { id: string; data: Partial<CreateComment> }>({
-    serviceName: "comments",
+  return commentService.useMutation<
+    Comment,
+    { id: string; data: Partial<CreateComment> }
+  >({
     keyToInvalidate: { queryKey: ["comments"] },
-    url: "/comments",
+    url: "/",
     method: "put",
     successMessage: "Comment updated successfully!",
     errorMessage: "Failed to update comment",
@@ -38,10 +38,9 @@ export const useUpdateComment = () => {
 
 // Mutation hook for deleting comments
 export const useDeleteComment = () => {
-  return useApiMutation<void, string>({
-    serviceName: "comments",
+  return commentService.useMutation<void, string>({
     keyToInvalidate: { queryKey: ["comments"] },
-    url: "/comments",
+    url: "/",
     method: "delete",
     successMessage: "Comment deleted successfully!",
     errorMessage: "Failed to delete comment",

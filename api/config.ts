@@ -1,4 +1,9 @@
-import { ApiClientOptions, ApiConfig } from "@learningpad/api-client";
+import {
+  ApiClientOptions,
+  ApiConfig,
+  ApiService,
+} from "@learningpad/api-client";
+import toast from "react-hot-toast";
 
 // Your API configuration
 const apiConfig: ApiClientOptions = {
@@ -41,23 +46,51 @@ const apiConfig: ApiClientOptions = {
   },
   // Token management (optional)
   tokenManager: {
-    getAccessToken: () => localStorage.getItem("access_token"),
-    getRefreshToken: () => localStorage.getItem("refresh_token"),
-    setAccessToken: (token: string) =>
-      localStorage.setItem("access_token", token),
-    setRefreshToken: (token: string) =>
-      localStorage.setItem("refresh_token", token),
+    getAccessToken: () => {
+      const token = localStorage.getItem("access_token");
+      console.log("[TokenManager] getAccessToken called, returning:", token);
+      return token;
+    },
+    getRefreshToken: () => {
+      const token = localStorage.getItem("refresh_token");
+      console.log("[TokenManager] getRefreshToken called, returning:", token);
+      return token;
+    },
+    setAccessToken: (token: string) => {
+      localStorage.setItem("access_token", token);
+      console.log("[TokenManager] setAccessToken called with:", token);
+      toast.success("Access token updated successfully");
+    },
+    setRefreshToken: (token: string) => {
+      localStorage.setItem("refresh_token", token);
+      console.log("[TokenManager] setRefreshToken called with:", token);
+      toast.success("Refresh token updated successfully");
+    },
     clearTokens: () => {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
+      console.log("[TokenManager] clearTokens called, tokens removed");
+      toast("Tokens cleared successfully", { icon: "ℹ️" });
     },
   },
   // Notifications (optional)
   notificationManager: {
-    success: (message: string) => console.log("✅", message),
-    error: (message: string) => console.error("❌", message),
-    info: (message: string) => console.log("ℹ️", message),
-    warning: (message: string) => console.warn("⚠️", message),
+    success: (message: string) => {
+      console.log("✅", message);
+      toast.success(message);
+    },
+    error: (message: string) => {
+      console.error("❌", message);
+      toast.error(message);
+    },
+    info: (message: string) => {
+      console.log("ℹ️", message);
+      toast(message);
+    },
+    warning: (message: string) => {
+      console.warn("⚠️", message);
+      toast(message);
+    },
   },
   // Unauthorized handler (optional)
   onUnauthorized: () => {
@@ -66,7 +99,10 @@ const apiConfig: ApiClientOptions = {
   },
 };
 
-// Initialize the API client
+// In your config file
 ApiConfig.initialize(apiConfig);
 
-export default apiConfig;
+const postService = new ApiService("posts");
+const commentService = new ApiService("comments");
+
+export { commentService, postService };

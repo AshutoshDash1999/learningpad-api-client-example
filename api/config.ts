@@ -107,5 +107,13 @@ const commentService = new ApiService("comments");
 const userService = new ApiService("users");
 const albumService = new ApiService("albums");
 const todoService = new ApiService("todos");
+const photoService = new ApiService("photos");
 
-export { albumService, commentService, postService, todoService, userService };
+export {
+  albumService,
+  commentService,
+  photoService,
+  postService,
+  todoService,
+  userService,
+};

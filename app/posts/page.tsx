@@ -6,8 +6,7 @@ import { PostForm } from "@/app/posts/_components/PostForm";
 import { PostsSkeleton } from "@/app/posts/_components/PostsSkeleton";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 
 /**
  * Posts Page - Demonstrates comprehensive usage of @learningpad/api-client

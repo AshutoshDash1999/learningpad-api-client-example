@@ -4,5 +4,6 @@ export { CommentsSection } from "./CommentsSection";
 export { CommentsSkeleton } from "./CommentsSkeleton";
 export { CreateCommentForm } from "./CreateCommentForm";
 export { PostCard } from "./PostCard";
+export { PostDetail } from "./PostDetail";
 export { PostForm } from "./PostForm";
 export { PostsSkeleton } from "./PostsSkeleton";

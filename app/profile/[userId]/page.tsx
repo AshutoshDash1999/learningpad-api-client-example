@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ArrowLeft,
   Building2,
   Edit,
   Globe,
@@ -27,6 +28,7 @@ import {
   User,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -198,6 +200,17 @@ const ProfilePage = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
+      <Button
+        asChild
+        variant="ghost"
+        className="mb-4 p-0 h-auto hover:bg-transparent"
+      >
+        <Link href="/posts">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Posts
+        </Link>
+      </Button>
+
       <Form {...form}>
         <div className="space-y-6">
           {/* Header */}

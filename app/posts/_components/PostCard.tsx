@@ -100,9 +100,17 @@ export function PostCard({ post }: PostCardProps) {
           >
             User {post.userId}
           </Link>
-          <Badge variant="secondary" className="text-xs">
-            Post #{post.id}
-          </Badge>
+          <Link
+            href={`/posts/${post.id}`}
+            className="hover:text-primary hover:underline transition-colors"
+          >
+            <Badge
+              variant="secondary"
+              className="text-xs cursor-pointer hover:bg-primary/10"
+            >
+              Post #{post.id}
+            </Badge>
+          </Link>
         </div>
       </CardHeader>
 

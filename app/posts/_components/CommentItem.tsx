@@ -16,18 +16,19 @@ import { CommentForm } from "./CommentForm";
 
 interface CommentItemProps {
   comment: Comment;
+  postId: string;
 }
 
-export function CommentItem({ comment }: CommentItemProps) {
+export function CommentItem({ comment, postId }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Comment mutation hooks
   const { mutateAsync: updateComment, isPending: isUpdatingComment } =
-    useUpdateComment();
+    useUpdateComment(postId);
 
   const { mutateAsync: deleteComment, isPending: isDeletingComment } =
-    useDeleteComment();
+    useDeleteComment(postId);
 
   const handleUpdateComment = async (data: {
     name: string;

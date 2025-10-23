@@ -1,10 +1,18 @@
 import { postService } from "../config";
 
-// Query hook for fetching users
+// Query hook for fetching all posts
 export const usePosts = () => {
   return postService.useQuery<Post[]>({
     key: ["posts"],
     url: "",
+  });
+};
+
+// Query hook for fetching a single post
+export const usePost = (id: string) => {
+  return postService.useQuery<Post>({
+    key: ["post", id],
+    url: `/${id}`,
   });
 };
 

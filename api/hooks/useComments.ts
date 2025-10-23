@@ -1,6 +1,6 @@
 import { commentService } from "../config";
 
-// Query hook for fetching comments
+// Query hook for fetching all comments
 export const useComments = () => {
   return commentService.useQuery<Comment[]>({
     key: ["comments"],
@@ -8,10 +8,18 @@ export const useComments = () => {
   });
 };
 
+// Query hook for fetching comments by postId
+export const useCommentsByPostId = (postId: string) => {
+  return commentService.useQuery<Comment[]>({
+    key: ["comments", "postId", postId],
+    url: `?postId=${postId}`,
+  });
+};
+
 // Mutation hook for creating comments
-export const useCreateComment = () => {
+export const useCreateComment = (postId: string) => {
   return commentService.useMutation<Comment, CreateComment>({
-    keyToInvalidate: { queryKey: ["comments"] },
+    keyToInvalidate: { queryKey: ["comments", "postId", postId] },
     url: "",
     method: "post",
     successMessage: "Comment created successfully!",
@@ -20,12 +28,12 @@ export const useCreateComment = () => {
 };
 
 // Mutation hook for updating comments
-export const useUpdateComment = () => {
+export const useUpdateComment = (postId: string) => {
   const mutation = commentService.useMutation<
     Comment,
     { id: string; data: Partial<CreateComment> }
   >({
-    keyToInvalidate: { queryKey: ["comments"] },
+    keyToInvalidate: { queryKey: ["comments", "postId", postId] },
     url: "",
     method: "put",
     successMessage: "Comment updated successfully!",
@@ -47,9 +55,9 @@ export const useUpdateComment = () => {
 };
 
 // Mutation hook for deleting comments
-export const useDeleteComment = () => {
+export const useDeleteComment = (postId: string) => {
   const mutation = commentService.useMutation<void, string>({
-    keyToInvalidate: { queryKey: ["comments"] },
+    keyToInvalidate: { queryKey: ["comments", "postId", postId] },
     url: "",
     method: "delete",
     successMessage: "Comment deleted successfully!",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useProfile, useUpdateProfile } from "@/api/hooks/useProfile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -219,9 +220,15 @@ const ProfilePage = () => {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="h-6 w-6 text-primary" />
-              </div>
+              <Avatar className="w-12 h-12">
+                <AvatarImage
+                  src={`https://avatar.iran.liara.run/public/${profile.id}`}
+                  alt={profile.name}
+                />
+                <AvatarFallback className="bg-primary/10">
+                  <User className="h-6 w-6 text-primary" />
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <h1 className="text-2xl font-bold">
                   {isEditing ? (

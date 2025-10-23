@@ -73,25 +73,24 @@ const UserPostsTab = ({ userId }: UserPostsTabProps) => {
 
       <div className="grid gap-4">
         {posts.map((post) => (
-          <Card key={post.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <CardTitle className="text-lg line-clamp-2">
-                  {post.title}
-                </CardTitle>
-                <Link
-                  href={`/posts/${post.id}`}
-                  className="flex items-center gap-1 text-sm text-primary hover:underline shrink-0"
-                >
+          <Link key={post.id} href={`/posts/${post.id}`}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-4">
+                  <CardTitle className="text-lg line-clamp-2">
+                    {post.title}
+                  </CardTitle>
+
                   <ExternalLink className="h-4 w-4" />
-                  View
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground line-clamp-3">{post.body}</p>
-            </CardContent>
-          </Card>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground line-clamp-3">
+                  {post.body}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

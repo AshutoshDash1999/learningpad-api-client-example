@@ -78,10 +78,8 @@ export function PostCard({ post }: PostCardProps) {
     try {
       await deletePost(post.id.toString());
       setShowDeleteConfirm(false);
-      toast.success("Post deleted successfully!");
     } catch (error) {
       console.error("Failed to delete post:", error);
-      toast.error("Failed to delete post. Please try again.");
     }
   };
 

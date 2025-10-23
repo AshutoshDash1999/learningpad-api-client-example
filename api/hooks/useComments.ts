@@ -5,9 +5,6 @@ export const useComments = () => {
   return commentService.useQuery<Comment[]>({
     key: ["comments"],
     url: "/",
-    options: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
   });
 };
 
@@ -24,7 +21,7 @@ export const useCreateComment = () => {
 
 // Mutation hook for updating comments
 export const useUpdateComment = () => {
-  return commentService.useMutation<
+  const mutation = commentService.useMutation<
     Comment,
     { id: string; data: Partial<CreateComment> }
   >({
@@ -34,15 +31,35 @@ export const useUpdateComment = () => {
     successMessage: "Comment updated successfully!",
     errorMessage: "Failed to update comment",
   });
+
+  return {
+    ...mutation,
+    mutateAsync: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<CreateComment>;
+    }) => {
+      return commentService.put(`/${id}`, data);
+    },
+  };
 };
 
 // Mutation hook for deleting comments
 export const useDeleteComment = () => {
-  return commentService.useMutation<void, string>({
+  const mutation = commentService.useMutation<void, string>({
     keyToInvalidate: { queryKey: ["comments"] },
     url: "",
     method: "delete",
     successMessage: "Comment deleted successfully!",
     errorMessage: "Failed to delete comment",
   });
+
+  return {
+    ...mutation,
+    mutateAsync: async (id: string) => {
+      return commentService.delete(`/${id}`);
+    },
+  };
 };

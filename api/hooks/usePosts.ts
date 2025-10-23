@@ -5,9 +5,6 @@ export const usePosts = () => {
   return postService.useQuery<Post[]>({
     key: ["posts"],
     url: "",
-    options: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
   });
 };
 
@@ -22,9 +19,9 @@ export const useCreatePost = () => {
   });
 };
 
-// Mutation hook for updating users
+// Mutation hook for updating posts
 export const useUpdatePost = () => {
-  return postService.useMutation<
+  const mutation = postService.useMutation<
     Post,
     { id: string; data: Partial<CreatePost> }
   >({
@@ -34,15 +31,35 @@ export const useUpdatePost = () => {
     successMessage: "Post updated successfully!",
     errorMessage: "Failed to update post",
   });
+
+  return {
+    ...mutation,
+    mutateAsync: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<CreatePost>;
+    }) => {
+      return postService.put(`/${id}`, data);
+    },
+  };
 };
 
-// Mutation hook for deleting users
+// Mutation hook for deleting posts
 export const useDeletePost = () => {
-  return postService.useMutation<void, string>({
+  const mutation = postService.useMutation<void, string>({
     keyToInvalidate: { queryKey: ["posts"] },
     url: "",
     method: "delete",
     successMessage: "Post deleted successfully!",
     errorMessage: "Failed to delete post",
   });
+
+  return {
+    ...mutation,
+    mutateAsync: async (id: string) => {
+      return postService.delete(`/${id}`);
+    },
+  };
 };

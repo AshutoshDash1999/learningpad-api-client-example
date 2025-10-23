@@ -4,7 +4,7 @@ import { postService } from "../config";
 export const usePosts = () => {
   return postService.useQuery<Post[]>({
     key: ["posts"],
-    url: "/",
+    url: "",
     options: {
       staleTime: 5 * 60 * 1000, // 5 minutes
     },
@@ -15,7 +15,7 @@ export const usePosts = () => {
 export const useCreatePost = () => {
   return postService.useMutation<Post, CreatePost>({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "/",
+    url: "",
     method: "post",
     successMessage: "Post created successfully!",
     errorMessage: "Failed to create post",
@@ -29,7 +29,7 @@ export const useUpdatePost = () => {
     { id: string; data: Partial<CreatePost> }
   >({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "/",
+    url: "",
     method: "put",
     successMessage: "Post updated successfully!",
     errorMessage: "Failed to update post",
@@ -40,7 +40,7 @@ export const useUpdatePost = () => {
 export const useDeletePost = () => {
   return postService.useMutation<void, string>({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "/",
+    url: "",
     method: "delete",
     successMessage: "Post deleted successfully!",
     errorMessage: "Failed to delete post",

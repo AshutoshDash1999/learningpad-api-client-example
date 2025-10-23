@@ -1,18 +1,6 @@
 "use client";
 
-import {
-  useComments,
-  useCreateComment,
-  useDeleteComment,
-  useUpdateComment,
-} from "@/api/hooks/useComments";
-import {
-  useCreatePost,
-  useDeletePost,
-  usePosts,
-  useUpdatePost,
-} from "@/api/hooks/usePosts";
-import { CommentsModal } from "@/app/posts/_components/CommentsModal";
+import { useCreatePost, usePosts } from "@/api/hooks/usePosts";
 import { PostCard } from "@/app/posts/_components/PostCard";
 import { PostForm } from "@/app/posts/_components/PostForm";
 import { PostsSkeleton } from "@/app/posts/_components/PostsSkeleton";
@@ -34,9 +22,7 @@ import toast from "react-hot-toast";
 
 export default function PostsPage() {
   // State for modal management
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showCreatePostForm, setShowCreatePostForm] = useState(false);
-  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   /**
    * QUERY HOOKS - Demonstrates data fetching with @learningpad/api-client
@@ -55,12 +41,6 @@ export default function PostsPage() {
     refetch: refetchPosts,
   } = usePosts();
 
-  const {
-    data: comments,
-    isLoading: commentsLoading,
-    error: commentsError,
-  } = useComments();
-
   /**
    * MUTATION HOOKS - Demonstrates CRUD operations with @learningpad/api-client
    *
@@ -70,48 +50,8 @@ export default function PostsPage() {
    * - Success/error notifications
    * - Loading states during mutations
    */
-  const {
-    mutateAsync: createPost,
-    isPending: isCreatingPost,
-    error: createPostError,
-  } = useCreatePost();
-
-  const {
-    mutateAsync: updatePost,
-    isPending: isUpdatingPost,
-    error: updatePostError,
-  } = useUpdatePost();
-
-  const {
-    mutateAsync: deletePost,
-    isPending: isDeletingPost,
-    error: deletePostError,
-  } = useDeletePost();
-
-  const {
-    mutateAsync: createComment,
-    isPending: isCreatingComment,
-    error: createCommentError,
-  } = useCreateComment();
-
-  const {
-    mutateAsync: updateComment,
-    isPending: isUpdatingComment,
-    error: updateCommentError,
-  } = useUpdateComment();
-
-  const {
-    mutateAsync: deleteComment,
-    isPending: isDeletingComment,
-    error: deleteCommentError,
-  } = useDeleteComment();
-
-  // Filter comments for selected post
-  const postComments = selectedPost
-    ? comments?.filter(
-        (comment: Comment) => comment.postId === selectedPost.id
-      ) || []
-    : [];
+  const { mutateAsync: createPost, isPending: isCreatingPost } =
+    useCreatePost();
 
   /**
    * POST OPERATIONS
@@ -124,102 +64,9 @@ export default function PostsPage() {
     try {
       await createPost(data);
       setShowCreatePostForm(false);
-      toast.success("Post created successfully!");
     } catch (error) {
       console.error("Failed to create post:", error);
-      toast.error("Failed to create post. Please try again.");
-    }
-  };
-
-  const handleUpdatePost = async (data: {
-    title: string;
-    body: string;
-    userId: number;
-  }) => {
-    if (!editingPost) return;
-
-    try {
-      await updatePost({
-        id: editingPost.id.toString(),
-        data,
-      });
-      setEditingPost(null);
-      toast.success("Post updated successfully!");
-    } catch (error) {
-      console.error("Failed to update post:", error);
-      toast.error("Failed to update post. Please try again.");
-    }
-  };
-
-  const handleDeletePost = async (postId: number) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      try {
-        await deletePost(postId.toString());
-        toast.success("Post deleted successfully!");
-      } catch (error) {
-        console.error("Failed to delete post:", error);
-        toast.error("Failed to delete post. Please try again.");
-      }
-    }
-  };
-
-  const handleEditPost = (post: Post) => {
-    setEditingPost(post);
-  };
-
-  const handleViewComments = (post: Post) => {
-    setSelectedPost(post);
-  };
-
-  /**
-   * COMMENT OPERATIONS
-   */
-  const handleCreateComment = async (data: {
-    name: string;
-    email: string;
-    body: string;
-    postId: number;
-  }) => {
-    try {
-      await createComment(data);
-      toast.success("Comment added successfully!");
-    } catch (error) {
-      console.error("Failed to create comment:", error);
-      toast.error("Failed to add comment. Please try again.");
-    }
-  };
-
-  const handleUpdateComment = async (comment: {
-    id: number;
-    name: string;
-    email: string;
-    body: string;
-  }) => {
-    try {
-      await updateComment({
-        id: comment.id.toString(),
-        data: {
-          name: comment.name,
-          email: comment.email,
-          body: comment.body,
-        },
-      });
-      toast.success("Comment updated successfully!");
-    } catch (error) {
-      console.error("Failed to update comment:", error);
-      toast.error("Failed to update comment. Please try again.");
-    }
-  };
-
-  const handleDeleteComment = async (commentId: number) => {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
-      try {
-        await deleteComment(commentId.toString());
-        toast.success("Comment deleted successfully!");
-      } catch (error) {
-        console.error("Failed to delete comment:", error);
-        toast.error("Failed to delete comment. Please try again.");
-      }
+      // Error or success toast message not required, since they are already declared in config
     }
   };
 
@@ -264,64 +111,21 @@ export default function PostsPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {posts?.slice(0, 12).map((post: Post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onEdit={handleEditPost}
-                onDelete={handleDeletePost}
-                onViewComments={handleViewComments}
-                isUpdating={isUpdatingPost}
-                isDeleting={isDeletingPost}
-              />
+              <PostCard key={post.id} post={post} />
             ))}
           </div>
         )}
       </div>
 
-      {/* COMMENTS MODAL */}
-      <CommentsModal
-        post={selectedPost}
-        comments={postComments}
-        isLoading={commentsLoading}
-        error={commentsError}
-        onClose={() => setSelectedPost(null)}
-        onEditComment={handleUpdateComment}
-        onDeleteComment={handleDeleteComment}
-        onCreateComment={handleCreateComment}
-        isCreatingComment={isCreatingComment}
-        isUpdatingComment={isUpdatingComment}
-        isDeletingComment={isDeletingComment}
-      />
-
       {/* CREATE POST FORM */}
-      {showCreatePostForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <PostForm
-            onSubmit={handleCreatePost}
-            onCancel={() => setShowCreatePostForm(false)}
-            isLoading={isCreatingPost}
-            title="Create New Post"
-          />
-        </div>
-      )}
-
-      {/* UPDATE POST FORM */}
-      {editingPost && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <PostForm
-            onSubmit={handleUpdatePost}
-            onCancel={() => setEditingPost(null)}
-            isLoading={isUpdatingPost}
-            title="Update Post"
-            isEdit={true}
-            initialData={{
-              title: editingPost.title,
-              body: editingPost.body,
-              userId: editingPost.userId,
-            }}
-          />
-        </div>
-      )}
+      <PostForm
+        open={showCreatePostForm}
+        onOpenChange={setShowCreatePostForm}
+        onSubmit={handleCreatePost}
+        onCancel={() => setShowCreatePostForm(false)}
+        isLoading={isCreatingPost}
+        title="Create New Post"
+      />
     </div>
   );
 }

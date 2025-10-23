@@ -1,16 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Save, User, X } from "lucide-react";
+import { FileText, Save, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
 import {
   Form,
   FormControl,
@@ -39,13 +39,6 @@ const postSchema = z.object({
 
 type PostFormData = z.infer<typeof postSchema>;
 
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-  userId: number;
-}
-
 interface PostFormProps {
   onSubmit: (data: PostFormData) => void;
   onCancel: () => void;
@@ -53,6 +46,8 @@ interface PostFormProps {
   initialData?: Partial<PostFormData>;
   title?: string;
   isEdit?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function PostForm({
@@ -62,6 +57,8 @@ export function PostForm({
   initialData,
   title = "Create Post",
   isEdit = false,
+  open = false,
+  onOpenChange,
 }: PostFormProps) {
   const form = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
@@ -76,26 +73,24 @@ export function PostForm({
     onSubmit(data);
   };
 
+  const handleCancel = () => {
+    form.reset();
+    onCancel();
+    if (onOpenChange) {
+      onOpenChange(false);
+    }
+  };
+
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             {title}
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
+          </DialogTitle>
+        </DialogHeader>
 
-      <CardContent>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
@@ -185,7 +180,7 @@ export function PostForm({
               <Button
                 type="button"
                 variant="outline"
-                onClick={onCancel}
+                onClick={handleCancel}
                 disabled={isLoading}
                 className="flex-1"
               >
@@ -194,7 +189,7 @@ export function PostForm({
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -15,7 +15,7 @@ export const useComments = () => {
 export const useCreateComment = () => {
   return commentService.useMutation<Comment, CreateComment>({
     keyToInvalidate: { queryKey: ["comments"] },
-    url: "/",
+    url: "",
     method: "post",
     successMessage: "Comment created successfully!",
     errorMessage: "Failed to create comment",
@@ -29,7 +29,7 @@ export const useUpdateComment = () => {
     { id: string; data: Partial<CreateComment> }
   >({
     keyToInvalidate: { queryKey: ["comments"] },
-    url: "/",
+    url: "",
     method: "put",
     successMessage: "Comment updated successfully!",
     errorMessage: "Failed to update comment",
@@ -40,7 +40,7 @@ export const useUpdateComment = () => {
 export const useDeleteComment = () => {
   return commentService.useMutation<void, string>({
     keyToInvalidate: { queryKey: ["comments"] },
-    url: "/",
+    url: "",
     method: "delete",
     successMessage: "Comment deleted successfully!",
     errorMessage: "Failed to delete comment",

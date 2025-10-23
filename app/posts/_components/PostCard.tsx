@@ -10,22 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Edit,
-  MessageCircle,
-  MoreHorizontal,
-  Trash2,
-  User,
-} from "lucide-react";
+import { Edit, MessageCircle, Trash2, User } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
+
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../../components/ui/card";
+} from "@/components/ui/card";
 import { CommentsSection } from "./CommentsSection";
 import { PostForm } from "./PostForm";
 
@@ -34,7 +30,6 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const [showActions, setShowActions] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -48,7 +43,6 @@ export function PostCard({ post }: PostCardProps) {
 
   const handleEdit = () => {
     setShowEditForm(true);
-    setShowActions(false);
   };
 
   const handleUpdatePost = async (data: {
@@ -71,7 +65,6 @@ export function PostCard({ post }: PostCardProps) {
 
   const handleDelete = () => {
     setShowDeleteConfirm(true);
-    setShowActions(false);
   };
 
   const handleConfirmDelete = async () => {
@@ -85,7 +78,6 @@ export function PostCard({ post }: PostCardProps) {
 
   const handleViewComments = () => {
     setShowCommentsModal(true);
-    setShowActions(false);
   };
 
   const handleCloseComments = () => {
@@ -99,18 +91,15 @@ export function PostCard({ post }: PostCardProps) {
           <CardTitle className="text-lg font-semibold line-clamp-2 leading-tight">
             {post.title}
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowActions(!showActions)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <User className="h-3 w-3" />
-          <span>User {post.userId}</span>
+          <Link
+            href={`/profile/${post.userId}`}
+            className="hover:text-primary hover:underline transition-colors"
+          >
+            User {post.userId}
+          </Link>
           <Badge variant="secondary" className="text-xs">
             Post #{post.id}
           </Badge>

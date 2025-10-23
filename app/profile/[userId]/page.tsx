@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
   Building2,
+  CheckSquare,
   Edit,
   Globe,
   Mail,
@@ -34,6 +36,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import { UserAlbumsTab, UserPostsTab, UserTodosTab } from "./_components";
 
 // Form schema with Zod validation
 const profileFormSchema = z.object({
@@ -523,6 +526,36 @@ const ProfilePage = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Tabs Section */}
+          <Tabs defaultValue="posts" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="posts">
+                <Edit className="h-4 w-4 mr-1" />
+                Posts
+              </TabsTrigger>
+              <TabsTrigger value="albums">
+                <Building2 className="h-4 w-4 mr-1" />
+                Albums
+              </TabsTrigger>
+              <TabsTrigger value="todos">
+                <CheckSquare className="h-4 w-4 mr-1" />
+                Todos
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="posts" className="mt-6">
+              <UserPostsTab userId={userId} />
+            </TabsContent>
+
+            <TabsContent value="albums" className="mt-6">
+              <UserAlbumsTab userId={userId} />
+            </TabsContent>
+
+            <TabsContent value="todos" className="mt-6">
+              <UserTodosTab userId={userId} />
+            </TabsContent>
+          </Tabs>
         </div>
       </Form>
     </div>

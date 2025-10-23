@@ -105,5 +105,7 @@ ApiConfig.initialize(apiConfig);
 const postService = new ApiService("posts");
 const commentService = new ApiService("comments");
 const userService = new ApiService("users");
+const albumService = new ApiService("albums");
+const todoService = new ApiService("todos");
 
-export { commentService, postService, userService };
+export { albumService, commentService, postService, todoService, userService };

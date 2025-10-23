@@ -72,3 +72,24 @@ interface UpdateProfile {
     bs?: string;
   };
 }
+
+interface Album {
+  userId: number;
+  id: number;
+  title: string;
+}
+
+interface Todo {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+interface Photo {
+  albumId: number;
+  id: number;
+  title: string;
+  url: string;
+  thumbnailUrl: string;
+}

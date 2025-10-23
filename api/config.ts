@@ -5,35 +5,79 @@ import {
 } from "@learningpad/api-client";
 import toast from "react-hot-toast";
 
+/**
+ * API Configuration for LearningPad API Client
+ *
+ * This file configures the API client with multiple services, token management,
+ * and notification handling. It uses JSONPlaceholder as the mock API backend.
+ *
+ * @see https://jsonplaceholder.typicode.com/ - Mock REST API for testing
+ * @see @learningpad/api-client - The underlying API client library
+ */
+
 // Your API configuration
 const apiConfig: ApiClientOptions = {
   services: {
-    // Your main API service
+    /**
+     * Posts Service
+     * Handles blog posts, articles, and content management
+     * Endpoints: GET /posts, GET /posts/:id, POST /posts, PUT /posts/:id, DELETE /posts/:id
+     */
     posts: {
       name: "posts",
       baseURL: "https://jsonplaceholder.typicode.com/posts",
       timeout: 10000,
     },
+
+    /**
+     * Users Service
+     * Handles user profiles, authentication, and user management
+     * Endpoints: GET /users, GET /users/:id, GET /users/:id/posts, GET /users/:id/albums, GET /users/:id/todos
+     */
     users: {
       name: "users",
       baseURL: "https://jsonplaceholder.typicode.com/users",
       timeout: 10000,
     },
+
+    /**
+     * Todos Service
+     * Handles task management and to-do items
+     * Endpoints: GET /todos, GET /todos/:id, POST /todos, PUT /todos/:id, DELETE /todos/:id
+     */
     todos: {
       name: "todos",
       baseURL: "https://jsonplaceholder.typicode.com/todos",
       timeout: 10000,
     },
+
+    /**
+     * Photos Service
+     * Handles image management and photo galleries
+     * Endpoints: GET /photos, GET /photos/:id, POST /photos, PUT /photos/:id, DELETE /photos/:id
+     */
     photos: {
       name: "photos",
       baseURL: "https://jsonplaceholder.typicode.com/photos",
       timeout: 10000,
     },
+
+    /**
+     * Albums Service
+     * Handles photo album organization and management
+     * Endpoints: GET /albums, GET /albums/:id, GET /albums/:id/photos, POST /albums, PUT /albums/:id, DELETE /albums/:id
+     */
     albums: {
       name: "albums",
       baseURL: "https://jsonplaceholder.typicode.com/albums",
       timeout: 10000,
     },
+
+    /**
+     * Comments Service
+     * Handles comments on posts and content
+     * Endpoints: GET /comments, GET /comments/:id, GET /comments?postId=:id, POST /comments, PUT /comments/:id, DELETE /comments/:id
+     */
     comments: {
       name: "comments",
       baseURL: "https://jsonplaceholder.typicode.com/comments",
@@ -44,7 +88,12 @@ const apiConfig: ApiClientOptions = {
   defaultHeaders: {
     "Content-Type": "application/json",
   },
-  // Token management (optional)
+
+  /**
+   * Token Management
+   * Handles JWT tokens for authentication
+   * Automatically includes tokens in API requests and manages refresh logic
+   */
   tokenManager: {
     getAccessToken: () => {
       const token = localStorage.getItem("access_token");
@@ -73,7 +122,12 @@ const apiConfig: ApiClientOptions = {
       toast("Tokens cleared successfully", { icon: "ℹ️" });
     },
   },
-  // Notifications (optional)
+
+  /**
+   * Notification Management
+   * Provides consistent toast notifications for API operations
+   * Automatically shows success/error messages for mutations
+   */
   notificationManager: {
     success: (message: string) => {
       console.log("✅", message);
@@ -92,16 +146,26 @@ const apiConfig: ApiClientOptions = {
       toast(message);
     },
   },
-  // Unauthorized handler (optional)
+
+  /**
+   * Unauthorized Handler
+   * Called when API returns 401 Unauthorized
+   * Automatically redirects to login page
+   */
   onUnauthorized: () => {
     // Redirect to login page
     window.location.href = "/login";
   },
 };
 
-// In your config file
+// Initialize the API configuration
 ApiConfig.initialize(apiConfig);
 
+/**
+ * API Service Instances
+ * Pre-configured service instances for each API endpoint
+ * Use these in your React hooks for data fetching and mutations
+ */
 const postService = new ApiService("posts");
 const commentService = new ApiService("comments");
 const userService = new ApiService("users");

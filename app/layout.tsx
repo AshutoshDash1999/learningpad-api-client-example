@@ -1,7 +1,7 @@
 import { Footer, Header } from "@/components/layout";
 import AppProvider from "@/components/providers/app-provider";
 import QueryProvider from "@/components/providers/query-provider";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 
@@ -41,11 +41,6 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
   metadataBase: new URL("https://learningpad-api-client.netlify.app"),
   alternates: {
@@ -93,6 +88,12 @@ export const metadata: Metadata = {
     google: "your-google-verification-code",
   },
   category: "technology",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

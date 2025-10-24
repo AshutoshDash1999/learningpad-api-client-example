@@ -88,40 +88,43 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 group">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-semibold line-clamp-2 leading-tight">
-            {post.title}
-          </CardTitle>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <User className="h-3 w-3" />
-          <Link
-            href={`/profile/${post.userId}`}
-            className="hover:text-primary hover:underline transition-colors"
-          >
-            User {post.userId}
-          </Link>
-          <Link
-            href={`/posts/${post.id}`}
-            className="hover:text-primary hover:underline transition-colors"
-          >
-            <Badge
-              variant="secondary"
-              className="text-xs cursor-pointer hover:bg-primary/10"
-            >
-              Post #{post.id}
-            </Badge>
-          </Link>
-        </div>
-      </CardHeader>
+    <Card className="hover:shadow-lg transition-all duration-200 group flex flex-col justify-between">
+      <div>
+        <CardHeader className="">
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-lg font-semibold line-clamp-2 leading-tight">
+              {post.title}
+            </CardTitle>
+          </div>
 
-      <CardContent className="pb-3">
-        <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">
-          {post.body}
-        </p>
-      </CardContent>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <User className="h-3 w-3" />
+            <Link
+              href={`/profile/${post.userId}`}
+              className="hover:text-primary hover:underline transition-colors"
+            >
+              User {post.userId}
+            </Link>
+            <Link
+              href={`/posts/${post.id}`}
+              className="hover:text-primary hover:underline transition-colors"
+            >
+              <Badge
+                variant="secondary"
+                className="text-xs cursor-pointer hover:bg-primary/10"
+              >
+                Post #{post.id}
+              </Badge>
+            </Link>
+          </div>
+        </CardHeader>
+
+        <CardContent className="">
+          <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">
+            {post.body}
+          </p>
+        </CardContent>
+      </div>
 
       <CardFooter className="pt-0">
         <div className="flex w-full gap-2">

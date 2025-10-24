@@ -2,13 +2,13 @@ import { Footer, Header } from "@/components/layout";
 import AppProvider from "@/components/providers/app-provider";
 import QueryProvider from "@/components/providers/query-provider";
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -109,7 +109,7 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/logo.png" />
       </head>
-      <body className={`${poppins.variable} antialiased`}>
+      <body className={`${nunito.variable} font-nunito antialiased`}>
         <QueryProvider>
           <AppProvider>
             <div className="flex min-h-screen flex-col">

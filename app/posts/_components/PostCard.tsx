@@ -1,5 +1,6 @@
 "use client";
 
+import { useCommentsByPostId } from "@/api/hooks/useComments";
 import { useDeletePost, useUpdatePost } from "@/api/hooks/usePosts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import {
 import { Edit, MessageCircle, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 import {
   Card,
@@ -35,11 +35,19 @@ export function PostCard({ post }: PostCardProps) {
   const [showEditForm, setShowEditForm] = useState(false);
 
   // Post mutation hooks
-  const { mutateAsync: updatePost, isPending: isUpdatingPost } =
-    useUpdatePost();
+  const { mutateAsync: updatePost, isPending: isUpdatingPost } = useUpdatePost(
+    post.id.toString()
+  );
 
-  const { mutateAsync: deletePost, isPending: isDeletingPost } =
-    useDeletePost();
+  const { mutateAsync: deletePost, isPending: isDeletingPost } = useDeletePost(
+    post.id.toString()
+  );
+
+  // Comments query - only fetch when modal is open
+  const { data: comments = [], isLoading: isLoadingComments } =
+    useCommentsByPostId(post.id.toString(), {
+      enabled: showCommentsModal,
+    });
 
   const handleEdit = () => {
     setShowEditForm(true);
@@ -51,15 +59,10 @@ export function PostCard({ post }: PostCardProps) {
     userId: number;
   }) => {
     try {
-      await updatePost({
-        id: post.id.toString(),
-        data,
-      });
+      await updatePost(data);
       setShowEditForm(false);
-      toast.success("Post updated successfully!");
     } catch (error) {
       console.error("Failed to update post:", error);
-      toast.error("Failed to update post. Please try again.");
     }
   };
 
@@ -69,7 +72,7 @@ export function PostCard({ post }: PostCardProps) {
 
   const handleConfirmDelete = async () => {
     try {
-      await deletePost(post.id.toString());
+      await deletePost();
       setShowDeleteConfirm(false);
     } catch (error) {
       console.error("Failed to delete post:", error);
@@ -162,7 +165,11 @@ export function PostCard({ post }: PostCardProps) {
             <DialogDescription>Manage comments for this post</DialogDescription>
           </DialogHeader>
 
-          <CommentsSection post={post} />
+          <CommentsSection
+            post={post}
+            comments={comments}
+            isLoading={isLoadingComments}
+          />
         </DialogContent>
       </Dialog>
 

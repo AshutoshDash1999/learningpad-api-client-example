@@ -24,10 +24,12 @@ export function PostDetail({ post }: PostDetailProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Post mutation hooks
-  const { mutateAsync: updatePost, isPending: isUpdatingPost } =
-    useUpdatePost();
-  const { mutateAsync: deletePost, isPending: isDeletingPost } =
-    useDeletePost();
+  const { mutateAsync: updatePost, isPending: isUpdatingPost } = useUpdatePost(
+    post.id.toString()
+  );
+  const { mutateAsync: deletePost, isPending: isDeletingPost } = useDeletePost(
+    post.id.toString()
+  );
 
   const handleUpdatePost = async (data: {
     title: string;
@@ -35,10 +37,7 @@ export function PostDetail({ post }: PostDetailProps) {
     userId: number;
   }) => {
     try {
-      await updatePost({
-        id: post.id.toString(),
-        data,
-      });
+      await updatePost(data);
       setShowEditForm(false);
     } catch (error) {
       console.error("Failed to update post:", error);
@@ -51,7 +50,7 @@ export function PostDetail({ post }: PostDetailProps) {
 
   const handleConfirmDelete = async () => {
     try {
-      await deletePost(post.id.toString());
+      await deletePost();
       setShowDeleteConfirm(false);
     } catch (error) {
       console.error("Failed to delete post:", error);

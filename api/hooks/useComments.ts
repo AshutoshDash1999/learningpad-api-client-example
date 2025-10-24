@@ -98,10 +98,14 @@ export const useComments = () => {
  * };
  * ```
  */
-export const useCommentsByPostId = (postId: string) => {
+export const useCommentsByPostId = (
+  postId: string,
+  options?: { enabled?: boolean }
+) => {
   return commentService.useQuery<Comment[]>({
     key: ["comments", "postId", postId],
     url: `?postId=${postId}`,
+    enabled: options?.enabled,
   });
 };
 

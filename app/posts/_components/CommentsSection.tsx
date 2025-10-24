@@ -9,13 +9,6 @@ import { useState } from "react";
 import { CommentItem } from "./CommentItem";
 import { CreateCommentForm } from "./CreateCommentForm";
 
-interface Post {
-  id: number;
-  title: string;
-  body: string;
-  userId: number;
-}
-
 interface CommentsSectionProps {
   post: Post;
   comments?: Comment[];

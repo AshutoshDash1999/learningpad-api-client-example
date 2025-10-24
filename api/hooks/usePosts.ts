@@ -84,6 +84,7 @@ export const useCreatePost = () => {
 /**
  * Hook to update an existing post
  *
+ * @param {string} id - The post ID to update
  * @returns {Object} React Query mutation result
  * @returns {Function} mutateAsync - Function to update a post
  * @returns {boolean} isPending - Loading state during update
@@ -92,44 +93,29 @@ export const useCreatePost = () => {
  * @returns {Function} reset - Function to reset mutation state
  *
  * @example
- * const updatePost = useUpdatePost();
+ * const updatePost = useUpdatePost("1");
  * await updatePost.mutateAsync({
- *   id: "1",
- *   data: {
- *     title: "Updated Title",
- *     body: "Updated content"
- *   }
+ *   title: "Updated Title",
+ *   body: "Updated content",
+ *   userId: 1
  * });
  */
-export const useUpdatePost = () => {
-  const mutation = postService.useMutation<
-    Post,
-    { id: string; data: Partial<CreatePost> }
-  >({
+export const useUpdatePost = (id: string) => {
+  const mutation = postService.useMutation<Post, Partial<CreatePost>>({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "",
+    url: `/${id}`,
     method: "put",
     successMessage: "Post updated successfully!",
     errorMessage: "Failed to update post",
   });
 
-  return {
-    ...mutation,
-    mutateAsync: async ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: Partial<CreatePost>;
-    }) => {
-      return postService.put(`/${id}`, data);
-    },
-  };
+  return mutation;
 };
 
 /**
  * Hook to delete a post
  *
+ * @param {string} id - The post ID to delete
  * @returns {Object} React Query mutation result
  * @returns {Function} mutateAsync - Function to delete a post
  * @returns {boolean} isPending - Loading state during deletion
@@ -138,22 +124,17 @@ export const useUpdatePost = () => {
  * @returns {Function} reset - Function to reset mutation state
  *
  * @example
- * const deletePost = useDeletePost();
- * await deletePost.mutateAsync("1");
+ * const deletePost = useDeletePost("1");
+ * await deletePost.mutateAsync();
  */
-export const useDeletePost = () => {
-  const mutation = postService.useMutation<void, string>({
+export const useDeletePost = (id: string) => {
+  const mutation = postService.useMutation<void, void>({
     keyToInvalidate: { queryKey: ["posts"] },
-    url: "",
+    url: `/${id}`,
     method: "delete",
     successMessage: "Post deleted successfully!",
     errorMessage: "Failed to delete post",
   });
 
-  return {
-    ...mutation,
-    mutateAsync: async (id: string) => {
-      return postService.delete(`/${id}`);
-    },
-  };
+  return mutation;
 };

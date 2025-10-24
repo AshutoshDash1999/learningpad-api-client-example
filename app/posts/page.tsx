@@ -72,13 +72,18 @@ export default function PostsPage() {
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <h1 className="text-3xl font-bold mb-8">Posts & Comments Management</h1>
-      <p className="text-gray-600 mb-8">
+      <p className="text-gray-600">
         This page demonstrates comprehensive usage of @learningpad/api-client
         with JSONPlaceholder API
       </p>
+      <p>
+        Please keep in mind that this is a demo and the data is not real. Hence
+        any changes you make will not be saved. Please make sure to check
+        network tab to see the API calls.
+      </p>
 
       {/* POSTS SECTION */}
-      <div className="mb-12">
+      <div className="my-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Posts</h2>
           <div className="space-x-2">

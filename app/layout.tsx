@@ -1,17 +1,14 @@
+import { Footer, Header } from "@/components/layout";
 import AppProvider from "@/components/providers/app-provider";
 import QueryProvider from "@/components/providers/query-provider";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -65,10 +62,10 @@ export const metadata: Metadata = {
     siteName: "LearningPad API Client Example",
     images: [
       {
-        url: "/og-image.png",
+        url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "LearningPad API Client Example - React Query Hooks Demo",
+        alt: "LearningPad API Client Example - TanStack React Query Hooks Demo",
       },
     ],
   },
@@ -78,7 +75,7 @@ export const metadata: Metadata = {
       "LearningPad API Client Example - React Query Hooks & JSONPlaceholder Demo",
     description:
       "Comprehensive React TypeScript example demonstrating @learningpad/api-client with JSONPlaceholder API. Features React Query hooks, CRUD operations, caching, error handling, and modern UI components.",
-    images: ["/og-image.png"],
+    images: ["/logo.png"],
     creator: "@learningpad",
   },
   robots: {
@@ -108,15 +105,20 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#000000" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${poppins.variable} antialiased`}>
         <QueryProvider>
-          <AppProvider>{children}</AppProvider>
+          <AppProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer version="1.1.0" />
+            </div>
+          </AppProvider>
         </QueryProvider>
       </body>
     </html>

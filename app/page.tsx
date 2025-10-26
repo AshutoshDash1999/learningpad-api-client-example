@@ -97,7 +97,7 @@ export default function Home() {
           </h2>
 
           {/* Step 1: Installation */}
-          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
+          <div className="p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">
               Step 1: Install @learningpad/api-client
             </h3>
@@ -110,34 +110,69 @@ export default function Home() {
 
               <TabsContent value="npm" className="mt-4">
                 <CodeBlock
-                  code="npm install @learningpad/api-client"
+                  code="npm install @learningpad/api-client @tanstack/react-query"
                   language="bash"
                 />
               </TabsContent>
 
               <TabsContent value="yarn" className="mt-4">
                 <CodeBlock
-                  code="yarn add @learningpad/api-client"
+                  code="yarn add @learningpad/api-client @tanstack/react-query"
                   language="bash"
                 />
               </TabsContent>
 
               <TabsContent value="pnpm" className="mt-4">
                 <CodeBlock
-                  code="pnpm add @learningpad/api-client"
+                  code="pnpm add @learningpad/api-client @tanstack/react-query"
                   language="bash"
                 />
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* Step 2: API Configuration */}
-          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
+          {/* Step 2: Query Provider Configuration */}
+          <div className="p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">
-              Step 2: API Configuration
+              Step 2: Query Provider Configuration
             </h3>
             <p className="text-gray-700 mb-4">
-              Configure the API client with multiple services and features:
+              Configure the Query Provider with the API client:
+            </p>
+            <CodeBlock
+              code={`// components/providers/query-provider.tsx
+"use client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+
+const QueryProvider = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 2, // 2 minutes
+        gcTime: 1000 * 60 * 10, // 10 minutes
+      },
+    },
+  });
+
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
+
+export default QueryProvider;
+`}
+              language="typescript"
+            />
+          </div>
+
+          {/* Step 3: API Configuration */}
+          <div className="p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">
+              Step 3: API Configuration
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Configure the API client with multiple services:
             </p>
             <CodeBlock
               code={`// api/config.ts
@@ -172,18 +207,55 @@ export const commentService = new ApiService("comments");`}
             />
           </div>
 
-          {/* Step 3: Custom Hooks */}
-          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
+          {/* Step 4: App Layout Setup */}
+          <div className="p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">
-              Step 3: Create Custom Hooks
+              Step 4: App Layout Setup
             </h3>
             <p className="text-gray-700 mb-4">
-              Create hooks using the API service instances:
+              Configure the app layout to include the Query Provider:
+            </p>
+            <CodeBlock
+              code={`// app/layout.tsx
+
+import QueryProvider from "@/components/providers/query-provider";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body>
+        <QueryProvider>
+          <main>{children}</main>
+        </QueryProvider>
+      </body>
+    </html>
+  );
+}`}
+              language="tsx"
+            />
+          </div>
+
+          {/* Step 5: Custom Hooks */}
+          <div className="p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">
+              Step 5: Create Custom Hooks
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Create hooks using the API service instances for all CRUD
+              operations:
             </p>
             <CodeBlock
               code={`// api/hooks/usePosts.ts
 import { postService } from "../config";
 
+// Read: Fetch all posts
 export const usePosts = () => {
   return postService.useQuery<Post[]>({
     key: ["posts"],
@@ -191,47 +263,95 @@ export const usePosts = () => {
   });
 };
 
+// Read: Fetch a single post
+export const usePost = (id: string) => {
+  return postService.useQuery<Post>({
+    key: ["post", id],
+    url: \`/\${id}\`,
+  });
+};
+
+// Create: Create a new post
 export const useCreatePost = () => {
   return postService.useMutation<Post, CreatePost>({
     keyToInvalidate: { queryKey: ["posts"] },
     url: "",
     method: "post",
     successMessage: "Post created successfully!",
+    errorMessage: "Failed to create post",
   });
 };
 
+// Update: Update an existing post
+export const useUpdatePost = (id: string) => {
+  return postService.useMutation<Post, Partial<CreatePost>>({
+    keyToInvalidate: { queryKey: ["posts"] },
+    url: \`/\${id}\`,
+    method: "put",
+    successMessage: "Post updated successfully!",
+    errorMessage: "Failed to update post",
+  });
+};
+
+// Delete: Delete a post
 export const useDeletePost = (id: string) => {
   return postService.useMutation<void, void>({
     keyToInvalidate: { queryKey: ["posts"] },
     url: \`/\${id}\`,
     method: "delete",
     successMessage: "Post deleted successfully!",
+    errorMessage: "Failed to delete post",
   });
 };`}
               language="typescript"
             />
           </div>
 
-          {/* Step 4: Component Usage */}
-          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
+          {/* Step 6: Component Usage */}
+          <div className="p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">
-              Step 4: Use Hooks in Components
+              Step 6: Use Hooks in Components
             </h3>
             <p className="text-gray-700 mb-4">
-              Example of how to use the hooks in a UI component:
+              Example of how to use all CRUD hooks in a UI component:
             </p>
             <CodeBlock
               code={`// app/posts/_components/PostCard.tsx
 "use client";
 
-import { useDeletePost } from "@/api/hooks/usePosts";
+import { useDeletePost, useUpdatePost, usePosts, usePost } from "@/api/hooks/usePosts";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function PostCard({ post }: { post: Post }) {
+  // Read Operations: Fetch data
+  // In parent component or here for list of posts
+  // const { data: posts, isLoading, error } = usePosts();
+  
+  // Fetch single post details
+  // const { data: postDetails } = usePost(post.id.toString());
+
+  // Update: useUpdatePost hook
+  const { mutateAsync: updatePost, isPending: isUpdating } = useUpdatePost(
+    post.id.toString()
+  );
+
+  // Delete: useDeletePost hook
   const { mutateAsync: deletePost, isPending: isDeletingPost } = useDeletePost(
     post.id.toString()
   );
+
+  const handleUpdate = async () => {
+    try {
+      await updatePost({
+        title: "Updated Title",
+        body: "Updated body content",
+        userId: 1,
+      });
+    } catch (error) {
+      console.error("Failed to update post:", error);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -253,7 +373,15 @@ export function PostCard({ post }: { post: Post }) {
           {post.body}
         </p>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleUpdate}
+          disabled={isUpdating}
+        >
+          {isUpdating ? "Updating..." : "Update"}
+        </Button>
         <Button
           variant="destructive"
           size="sm"
@@ -265,7 +393,28 @@ export function PostCard({ post }: { post: Post }) {
       </CardFooter>
     </Card>
   );
-}`}
+}
+
+// Example: Creating a new post (can be in a separate form component)
+// function CreatePostForm() {
+//   const { mutateAsync: createPost, isPending: isCreating } = useCreatePost();
+//
+//   const handleCreate = async () => {
+//     try {
+//       await createPost({
+//         title: "New Post",
+//         body: "Post content",
+//         userId: 1
+//       });
+//     } catch (error) {
+//       console.error("Failed to create post:", error);
+//     }
+//   };
+//
+//   return <Button onClick={handleCreate} disabled={isCreating}>
+//     {isCreating ? "Creating..." : "Create Post"}
+//   </Button>;
+// }`}
               language="tsx"
             />
           </div>
@@ -274,6 +423,10 @@ export function PostCard({ post }: { post: Post }) {
           <div className="bg-blue-100 p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">Key Features</h3>
             <ul className="space-y-2 text-gray-700">
+              <li>
+                • <strong>Complete CRUD Operations:</strong> Full support for
+                Create, Read, Update, and Delete operations with custom hooks
+              </li>
               <li>
                 • <strong>Multiple Services:</strong> Configure different API
                 endpoints for posts, users, comments, etc.
@@ -298,11 +451,15 @@ export function PostCard({ post }: { post: Post }) {
                 • <strong>Cache Invalidation:</strong> Automatic cache updates
                 after mutations
               </li>
+              <li>
+                • <strong>Loading & Error States:</strong> Built-in handling for
+                pending states and error scenarios
+              </li>
             </ul>
           </div>
 
           {/* Additional Resources */}
-          <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
+          <div className="p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-4">Additional Resources</h3>
             <ul className="space-y-2 text-gray-700">
               <li>

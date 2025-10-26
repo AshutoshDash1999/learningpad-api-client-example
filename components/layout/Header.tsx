@@ -1,14 +1,37 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { ArrowLeft, Copy, ExternalLink, Github } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const { isCopied, copyToClipboard } = useCopyToClipboard({
+    onCopy: () => toast.success("LLM context copied to clipboard!"),
+  });
+  const [llmContext, setLlmContext] = useState<string>("");
+
+  useEffect(() => {
+    // Fetch the llm.txt content on mount
+    fetch("/docs/llm.txt")
+      .then((res) => res.text())
+      .then((text) => setLlmContext(text))
+      .catch((err) => console.error("Failed to load LLM context:", err));
+  }, []);
+
+  const handleCopyLLMContext = () => {
+    if (llmContext) {
+      copyToClipboard(llmContext);
+    } else {
+      toast.error("LLM context not loaded yet");
+    }
+  };
 
   const handleBack = () => {
     router.back();
@@ -49,6 +72,20 @@ export default function Header() {
 
         {/* Right side - External links */}
         <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopyLLMContext}
+            disabled={isCopied || !llmContext}
+            className="flex items-center space-x-2"
+            title="Copy LLM context to clipboard"
+          >
+            <Copy className="h-4 w-4" />
+            <span className="hidden sm:inline">
+              {isCopied ? "Copied!" : "Copy LLM Context"}
+            </span>
+          </Button>
+
           <Button variant="ghost" size="sm" asChild>
             <Link
               href="https://www.learningpadedu.com/"

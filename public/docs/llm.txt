@@ -1,0 +1,323 @@
+# LearningPad API Client - LLM Context Documentation
+
+## Package Overview
+
+**Package Name:** `@learningpad/api-client`  
+**Version:** ^1.1.0  
+**Description:** React-based API client with type-safe hooks built on React Query.
+
+---
+
+## Installation
+
+```bash
+npm install @learningpad/api-client @tanstack/react-query react-hot-toast
+```
+
+---
+
+## Essential File Structure
+
+```
+your-project/
+├── api/
+│   ├── config.ts              # API configuration
+│   └── hooks/
+│       ├── usePosts.ts        # Posts CRUD hooks
+│       ├── useComments.ts     # Comments CRUD hooks
+│       └── useProfile.ts      # Profile hooks
+├── app/
+│   ├── layout.tsx             # Root layout with QueryProvider
+│   └── page.tsx               # Home page
+├── components/
+│   └── providers/
+│       └── query-provider.tsx # React Query provider
+└── package.json
+```
+
+---
+
+## Step-by-Step Setup
+
+### Step 1: Configure API Client (api/config.ts)
+
+```typescript
+import { ApiClientOptions, ApiConfig, ApiService } from "@learningpad/api-client";
+import toast from "react-hot-toast";
+
+const apiConfig: ApiClientOptions = {
+  services: {
+    posts: {
+      name: "posts",
+      baseURL: "https://jsonplaceholder.typicode.com/posts",
+      timeout: 10000,
+    },
+    comments: {
+      name: "comments",
+      baseURL: "https://jsonplaceholder.typicode.com/comments",
+      timeout: 10000,
+    },
+  },
+  defaultTimeout: 10000,
+  defaultHeaders: { "Content-Type": "application/json" },
+  tokenManager: {
+    getAccessToken: () => localStorage.getItem("access_token"),
+    setAccessToken: (token: string) => localStorage.setItem("access_token", token),
+    clearTokens: () => {
+      localStorage.removeItem("access_token");
+    },
+  },
+  notificationManager: {
+    success: (msg) => toast.success(msg),
+    error: (msg) => toast.error(msg),
+  },
+};
+
+ApiConfig.initialize(apiConfig);
+
+export const postService = new ApiService("posts");
+export const commentService = new ApiService("comments");
+```
+
+### Step 2: Setup Query Provider (components/providers/query-provider.tsx)
+
+```typescript
+"use client";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+export default function QueryProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 2, // 2 minutes
+      },
+    },
+  });
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
+```
+
+### Step 3: Wrap App (app/layout.tsx)
+
+```typescript
+import QueryProvider from "@/components/providers/query-provider";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Step 4: Create Hooks (api/hooks/usePosts.ts)
+
+```typescript
+import { postService } from "../config";
+
+// Fetch all posts
+export const usePosts = () => {
+  return postService.useQuery<Post[]>({
+    key: ["posts"],
+    url: "",
+  });
+};
+
+// Fetch single post
+export const usePost = (id: string) => {
+  return postService.useQuery<Post>({
+    key: ["post", id],
+    url: `/${id}`,
+  });
+};
+
+// Create post
+export const useCreatePost = () => {
+  return postService.useMutation<Post, CreatePostInput>({
+    keyToInvalidate: { queryKey: ["posts"] },
+    url: "",
+    method: "post",
+    successMessage: "Post created!",
+    errorMessage: "Failed to create post",
+  });
+};
+
+// Update post
+export const useUpdatePost = (id: string) => {
+  return postService.useMutation<Post, Partial<CreatePostInput>>({
+    keyToInvalidate: { queryKey: ["posts"] },
+    url: `/${id}`,
+    method: "put",
+    successMessage: "Post updated!",
+    errorMessage: "Failed to update post",
+  });
+};
+
+// Delete post
+export const useDeletePost = (id: string) => {
+  return postService.useMutation<void, void>({
+    keyToInvalidate: { queryKey: ["posts"] },
+    url: `/${id}`,
+    method: "delete",
+    successMessage: "Post deleted!",
+    errorMessage: "Failed to delete post",
+  });
+};
+```
+
+### Step 5: Use in Components (app/page.tsx)
+
+```typescript
+"use client";
+
+import { usePosts, useCreatePost } from "@/api/hooks/usePosts";
+import { useState } from "react";
+
+export default function PostsPage() {
+  const [showForm, setShowForm] = useState(false);
+
+  // Fetch posts
+  const { data: posts, isLoading, error, refetch } = usePosts();
+
+  // Create post
+  const { mutateAsync: createPost, isPending } = useCreatePost();
+
+  const handleCreate = async (data: CreatePostInput) => {
+    await createPost(data);
+    setShowForm(false);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      <button onClick={() => setShowForm(true)} disabled={isPending}>
+        Create Post
+      </button>
+      {posts?.map(post => (
+        <div key={post.id}>{post.title}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## Usage Patterns
+
+### Query Hook Pattern
+
+```typescript
+// api/hooks/usePosts.ts
+export const usePosts = () => {
+  return postService.useQuery<Post[]>({
+    key: ["posts"],
+    url: "",
+  });
+};
+
+// Usage in component
+const { data: posts, isLoading, error, refetch } = usePosts();
+```
+
+### Mutation Hook Pattern
+
+```typescript
+// api/hooks/usePosts.ts
+export const useCreatePost = () => {
+  return postService.useMutation<Post, CreatePostInput>({
+    keyToInvalidate: { queryKey: ["posts"] },
+    url: "",
+    method: "post",
+    successMessage: "Post created!",
+    errorMessage: "Failed to create",
+  });
+};
+
+// Usage in component
+const { mutateAsync: createPost, isPending } = useCreatePost();
+
+const handleCreate = async () => {
+  try {
+    await createPost({ title: "New", body: "Content", userId: 1 });
+  } catch (error) {
+    // Error toast auto-shows
+  }
+};
+```
+
+### Conditional Query
+
+```typescript
+// Only fetch when needed
+const { data: comments } = useCommentsByPostId(postId, {
+  enabled: showComments, // Only fetch when modal is open
+});
+```
+
+### Filtered Query
+
+```typescript
+export const useCommentsByPostId = (postId: string) => {
+  return commentService.useQuery<Comment[]>({
+    key: ["comments", postId],
+    url: `?postId=${postId}`,
+  });
+};
+```
+
+---
+
+## Type Definitions
+
+```typescript
+interface Post {
+  id: number;
+  title: string;
+  body: string;
+  userId: number;
+}
+
+interface CreatePostInput {
+  title: string;
+  body: string;
+  userId: number;
+}
+
+interface Comment {
+  id: number;
+  postId: number;
+  name: string;
+  email: string;
+  body: string;
+}
+```
+
+---
+
+## Key Features
+
+- **Type-Safe:** Full TypeScript support
+- **Caching:** Automatic with React Query
+- **Notifications:** Auto toast messages
+- **Error Handling:** Built-in error states
+- **Cache Invalidation:** Auto after mutations
+
+---
+
+## Common Patterns
+
+1. **Query:** `const { data, isLoading, error } = usePosts()`
+2. **Mutation:** `const { mutateAsync, isPending } = useCreatePost()`
+3. **Loading:** Always check `isLoading` before rendering
+4. **Error:** Always check `error` state
+5. **Cache:** Always invalidate with `keyToInvalidate`
+6. **Conditional:** Use `enabled` option to prevent unnecessary fetches
